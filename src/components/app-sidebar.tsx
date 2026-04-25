@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
@@ -111,14 +112,15 @@ export function AppSidebar({ userName, userEmail, workspaceName, plan = "profess
             {section.items.map((item) => {
               const Icon = item.icon;
               return (
-                <button
+                <Link
                   key={item.href}
-                  onClick={() => router.push(item.href)}
+                  href={item.href}
+                  prefetch={true}
                   className={navItemClass(item.href)}
                 >
                   <Icon size={16} />
                   {item.label}
-                </button>
+                </Link>
               );
             })}
           </div>
@@ -126,24 +128,26 @@ export function AppSidebar({ userName, userEmail, workspaceName, plan = "profess
 
         <div className="my-4 mx-3 border-t border-bdr" />
 
-        <button
-          onClick={() => router.push("/settings")}
+        <Link
+          href="/settings"
+          prefetch={true}
           className={navItemClass("/settings")}
         >
           <Settings size={16} />
           Innstillinger
-        </button>
+        </Link>
       </nav>
 
       {/* Activity */}
       <div className="px-3 pb-1">
-        <button
-          onClick={() => router.push("/pipeline")}
+        <Link
+          href="/pipeline"
+          prefetch={true}
           className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-[0.85rem] text-ink-muted hover:text-ink hover:bg-canvas-warm transition-all duration-150"
         >
           <History size={16} />
           <span className="flex-1 text-left">Aktivitet</span>
-        </button>
+        </Link>
       </div>
 
       {/* User card */}
