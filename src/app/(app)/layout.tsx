@@ -11,13 +11,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!ctx) redirect("/sign-in");
 
   return (
-    <div className="flex h-screen bg-[#faf9f6]">
+    <div className="flex h-screen bg-canvas">
       <AppSidebar
         userName={session.user.name}
         userEmail={session.user.email}
         workspaceName={ctx.workspace.name}
+        plan={ctx.workspace.plan ?? "trialing"}
       />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 overflow-y-auto ml-[240px]">{children}</main>
     </div>
   );
 }

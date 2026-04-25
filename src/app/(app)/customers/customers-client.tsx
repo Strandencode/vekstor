@@ -127,12 +127,12 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr flex items-center justify-between sticky top-0 z-40">
         <div>
-          <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">KUNDER</p>
-          <h1 className="text-2xl font-bold text-[#1a1a1a]">Vunne kunder</h1>
-          <p className="text-sm text-[#6b6b6b] mt-1">
+          <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">KUNDER</div>
+          <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Kunder</h1>
+          <p className="text-ink-muted text-[0.82rem] mt-1.5">
             {customers.length} kunder · {formatNOK(totalRevenue)} total omsetning
           </p>
         </div>
@@ -140,6 +140,7 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
           <Plus size={14} /> Legg til kunde
         </Button>
       </div>
+    <div className="p-8">
 
       {customers.length === 0 && (
         <div className="text-center py-20 text-[#9b9b9b]">
@@ -290,6 +291,7 @@ export default function CustomersClient({ initialCustomers }: { initialCustomers
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }

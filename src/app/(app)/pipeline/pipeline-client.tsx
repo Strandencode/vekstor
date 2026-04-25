@@ -76,13 +76,13 @@ function PipelineCard({
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white border border-[#e8e4dc] rounded-lg p-3 group hover:shadow-sm transition-shadow"
+      className="bg-canvas-soft border border-bdr rounded-md p-3 group hover:shadow-sm transition-shadow"
     >
       <div className="flex items-start gap-2">
         <button
           {...attributes}
           {...listeners}
-          className="mt-0.5 text-[#c4bfb6] hover:text-[#6b6b6b] cursor-grab active:cursor-grabbing flex-shrink-0"
+          className="mt-0.5 text-ink-subtle hover:text-ink-muted cursor-grab active:cursor-grabbing flex-shrink-0"
         >
           <GripVertical size={14} />
         </button>
@@ -96,7 +96,7 @@ function PipelineCard({
         <div className="flex items-center gap-1 flex-shrink-0">
           <button
             onClick={() => { setExpanded(!expanded); setNoteText(""); }}
-            className={`p-1 rounded hover:bg-[#f0ede6] transition-colors relative ${expanded ? "text-[#1a1a1a]" : "text-[#c4bfb6]"}`}
+            className={`p-1 rounded hover:bg-canvas-warm transition-colors relative ${expanded ? "text-ink" : "text-ink-subtle"}`}
           >
             <StickyNote size={13} />
             {notes.length > 0 && !expanded && (
@@ -107,7 +107,7 @@ function PipelineCard({
           </button>
           <button
             onClick={() => onRemove(item.id)}
-            className="p-1 rounded hover:bg-red-50 text-[#c4bfb6] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+            className="p-1 rounded hover:bg-rose-50 text-ink-subtle hover:text-err transition-colors opacity-0 group-hover:opacity-100"
           >
             <Trash2 size={13} />
           </button>
@@ -122,13 +122,13 @@ function PipelineCard({
               value={noteText}
               onChange={(e) => setNoteText(e.target.value)}
               placeholder="Legg til notat…"
-              className="flex-1 px-2 py-1.5 text-xs border border-[#e8e4dc] rounded-md outline-none focus:border-[#1a1a1a] bg-[#faf9f6]"
+              className="flex-1 px-2 py-1.5 text-xs border border-bdr rounded-md outline-none focus:border-ink bg-canvas-warm"
               onKeyDown={(e) => { if (e.key === "Enter") submitNote(); }}
             />
             <button
               onClick={submitNote}
               disabled={!noteText.trim()}
-              className="p-1.5 rounded-md bg-[#1a1a1a] text-white disabled:opacity-30 hover:bg-[#333] transition-colors"
+              className="p-1.5 rounded-md bg-ink text-canvas disabled:opacity-30 hover:bg-ink-soft transition-colors"
             >
               <Send size={11} />
             </button>
@@ -136,7 +136,7 @@ function PipelineCard({
           {notes.length > 0 && (
             <div className="space-y-1.5 max-h-28 overflow-y-auto">
               {[...notes].reverse().map((note, i) => (
-                <div key={i} className="p-2 bg-[#faf9f6] rounded text-xs text-[#4a4a4a]">
+                <div key={i} className="p-2 bg-canvas-warm rounded-md text-xs text-ink-muted">
                   <p>{note.text}</p>
                   <p className="text-[10px] text-[#9b9b9b] mt-0.5">
                     {new Date(note.ts).toLocaleDateString("nb-NO", { day: "numeric", month: "short" })}
@@ -163,8 +163,8 @@ function StageColumn({
   onAddNote: (id: string, text: string) => void;
 }) {
   return (
-    <div className="flex flex-col w-[280px] flex-shrink-0 bg-[#faf9f6] border border-[#e8e4dc] rounded-xl">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#e8e4dc]">
+    <div className="flex flex-col w-[280px] flex-shrink-0 bg-canvas-soft border border-bdr rounded-md">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-bdr">
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-[#1a1a1a]">{stage.label}</span>
           <span
@@ -178,7 +178,7 @@ function StageColumn({
       <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
         <div className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[120px]">
           {items.length === 0 && (
-            <p className="text-xs text-[#9b9b9b] text-center py-6">
+            <p className="text-xs text-ink-subtle text-center py-6">
               {stage.id === "new" ? "Legg til fra søk" : "Dra kort hit"}
             </p>
           )}
@@ -287,12 +287,12 @@ export default function PipelineClient({ initialItems }: { initialItems: Pipelin
   const total = items.length;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-0px)]">
-      <div className="px-8 py-6 border-b border-[#e8e4dc] bg-white flex items-center justify-between flex-shrink-0">
+    <div className="flex flex-col h-screen">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr flex items-center justify-between flex-shrink-0 sticky top-0 z-40">
         <div>
-          <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">SALG</p>
-          <h1 className="text-2xl font-bold text-[#1a1a1a]">Pipeline</h1>
-          <p className="text-sm text-[#6b6b6b] mt-1">
+          <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">KUNDER</div>
+          <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Pipeline</h1>
+          <p className="text-ink-muted text-[0.82rem] mt-1.5">
             {total > 0 ? `${total} leads i pipeline` : "Dra leads mellom kolonner for å oppdatere status"}
           </p>
         </div>
@@ -314,7 +314,7 @@ export default function PipelineClient({ initialItems }: { initialItems: Pipelin
 
           <DragOverlay>
             {activeItem && (
-              <div className="bg-white border border-[#e8e4dc] rounded-lg p-3 shadow-xl rotate-1 w-[256px]">
+              <div className="bg-canvas-soft border border-bdr rounded-md p-3 shadow-xl rotate-1 w-[256px]">
                 <p className="text-sm font-medium text-[#1a1a1a] truncate">{activeItem.name ?? "—"}</p>
                 <p className="text-xs text-[#6b6b6b]">{activeItem.industry ?? "Ukjent bransje"}</p>
               </div>

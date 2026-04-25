@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist_Mono, Work_Sans, Outfit } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
-const geist = Geist({
-  variable: "--font-geist-sans",
+const workSans = Work_Sans({
+  variable: "--font-work-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -15,8 +27,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="nb" className={`${geist.variable} h-full antialiased`}>
-      <body className="min-h-full">
+    <html lang="nb" className={`${workSans.variable} ${outfit.variable} ${geistMono.variable} h-full antialiased`}>
+      <body className="min-h-full font-body">
         {children}
         <Toaster richColors />
       </body>

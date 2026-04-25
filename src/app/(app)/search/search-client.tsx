@@ -159,12 +159,15 @@ export default function SearchClient() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">PROSPEKTERING</p>
-        <h1 className="text-2xl font-bold text-[#1a1a1a]">Søk</h1>
-        <p className="text-sm text-[#6b6b6b] mt-1">Søk i Brønnøysundregistrene</p>
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr flex items-center justify-between sticky top-0 z-40">
+        <div>
+          <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">LEADS</div>
+          <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Prospektering</h1>
+          <p className="text-ink-muted text-[0.82rem] mt-1.5">Søk i Brønnøysundregistrene</p>
+        </div>
       </div>
+    <div className="p-8">
 
       <form onSubmit={handleSearch} className="bg-white border border-[#e8e4dc] rounded-lg p-5 mb-6">
         <div className="grid grid-cols-4 gap-4 mb-4">
@@ -376,6 +379,7 @@ export default function SearchClient() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
     </div>
   );
 }

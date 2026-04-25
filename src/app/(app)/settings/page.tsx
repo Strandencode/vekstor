@@ -42,8 +42,13 @@ export default async function SettingsPage() {
   });
 
   return (
-    <div className="p-8 max-w-3xl">
-      <h1 className="text-2xl font-bold text-[#1a1a1a] mb-6">Innstillinger</h1>
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr sticky top-0 z-40">
+        <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">KONTO</div>
+        <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Innstillinger</h1>
+        <p className="text-ink-muted text-[0.82rem] mt-1.5">Administrer profil, arbeidsområde og team</p>
+      </div>
+      <div className="p-8 max-w-3xl">
       <Tabs defaultValue="profile">
         <TabsList className="mb-6">
           <TabsTrigger value="profile">Profil</TabsTrigger>
@@ -91,6 +96,7 @@ export default async function SettingsPage() {
           <AccountTab />
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

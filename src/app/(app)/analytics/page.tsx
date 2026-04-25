@@ -84,12 +84,13 @@ export default async function AnalyticsPage() {
   const recentUsage = usage.slice(0, 6).reverse();
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">STATISTIKK</p>
-        <h1 className="text-2xl font-bold text-[#1a1a1a]">Analyse</h1>
-        <p className="text-sm text-[#6b6b6b] mt-1">Oversikt over salgsaktivitet og pipeline-helse</p>
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr sticky top-0 z-40">
+        <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">INNSIKT</div>
+        <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Analytics</h1>
+        <p className="text-ink-muted text-[0.82rem] mt-1.5">Oversikt over salgsaktivitet og pipeline-helse</p>
       </div>
+    <div className="p-8">
 
       <div className="grid grid-cols-4 gap-4 mb-8">
         <StatCard label="Pipeline" value={totalPipeline} icon={TrendingUp} sub="aktive leads" />
@@ -152,6 +153,7 @@ export default async function AnalyticsPage() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

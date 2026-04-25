@@ -223,18 +223,19 @@ export default function EmailClient({ initialTemplates }: { initialTemplates: Te
   }
 
   return (
-    <div className="p-8 h-full">
-      <div className="mb-6 flex items-start justify-between">
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr flex items-center justify-between sticky top-0 z-40">
         <div>
-          <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">UTSENDELSE</p>
-          <h1 className="text-2xl font-bold text-[#1a1a1a]">E-postmaler</h1>
-          <p className="text-sm text-[#6b6b6b] mt-1">Lag og administrer e-postmaler for kald canvas</p>
+          <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">LEADS</div>
+          <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>E-postmaler</h1>
+          <p className="text-ink-muted text-[0.82rem] mt-1.5">Lag og administrer e-postmaler for kald canvas</p>
         </div>
         <Button onClick={handleNew} className="flex items-center gap-2">
           <Plus size={14} /> Ny mal
         </Button>
       </div>
 
+      <div className="p-8">
       <div className="grid grid-cols-3 gap-6 h-[calc(100vh-220px)]">
         <div className="col-span-1 space-y-2 overflow-y-auto pr-1">
           {templates.length === 0 && !editingTemplate && (
@@ -300,6 +301,7 @@ export default function EmailClient({ initialTemplates }: { initialTemplates: Te
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

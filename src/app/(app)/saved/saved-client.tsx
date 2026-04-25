@@ -69,15 +69,15 @@ export default function SavedClient({ initialLists }: { initialLists: SavedList[
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-6">
-        <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">PROSPEKTERING</p>
-        <h1 className="text-2xl font-bold text-[#1a1a1a]">Lagrede lister</h1>
-        <p className="text-sm text-[#6b6b6b] mt-1">
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr sticky top-0 z-40">
+        <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">LEADS</div>
+        <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>Lagrede lister</h1>
+        <p className="text-ink-muted text-[0.82rem] mt-1.5">
           {lists.length > 0 ? `${lists.length} lister lagret` : "Lagre søk fra Søk-siden for å se dem her"}
         </p>
       </div>
-
+    <div className="p-8">
       {lists.length === 0 && (
         <div className="text-center py-20 text-[#9b9b9b]">
           <Bookmark size={40} className="mx-auto mb-3 opacity-30" />
@@ -184,6 +184,7 @@ export default function SavedClient({ initialLists }: { initialLists: SavedList[
           );
         })}
       </div>
+    </div>
     </div>
   );
 }

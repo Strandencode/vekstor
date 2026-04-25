@@ -1,117 +1,194 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
-  LayoutDashboard,
+  Home,
   Search,
-  Target,
-  Kanban,
-  Users,
   Mail,
   Bookmark,
-  BarChart2,
+  Kanban,
+  Users,
+  Target,
+  BarChart3,
   Settings,
   LogOut,
+  ChevronDown,
+  History,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { authClient } from "@/lib/auth-client";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useState } from "react";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/search", label: "Søk", icon: Search },
-  { href: "/icp", label: "ICP", icon: Target },
-  { href: "/pipeline", label: "Pipeline", icon: Kanban },
-  { href: "/customers", label: "Kunder", icon: Users },
-  { href: "/email", label: "E-post", icon: Mail },
-  { href: "/saved", label: "Lagrede", icon: Bookmark },
-  { href: "/analytics", label: "Analyse", icon: BarChart2 },
-  { href: "/settings", label: "Innstillinger", icon: Settings },
+const NAV_SECTIONS = [
+  {
+    label: "",
+    items: [{ label: "Home", icon: Home, href: "/dashboard" }],
+  },
+  {
+    label: "Leads",
+    items: [
+      { label: "Prospektering", icon: Search, href: "/search" },
+      { label: "E-postmaler", icon: Mail, href: "/email" },
+      { label: "Lagrede lister", icon: Bookmark, href: "/saved" },
+    ],
+  },
+  {
+    label: "Kunder",
+    items: [
+      { label: "Pipeline", icon: Kanban, href: "/pipeline" },
+      { label: "Kunder", icon: Users, href: "/customers" },
+    ],
+  },
+  {
+    label: "Innsikt",
+    items: [
+      { label: "ICP-analyse", icon: Target, href: "/icp" },
+      { label: "Analytics", icon: BarChart3, href: "/analytics" },
+    ],
+  },
 ];
 
 interface Props {
   userName: string;
   userEmail: string;
   workspaceName: string;
+  plan?: string;
 }
 
-export function AppSidebar({ userName, userEmail, workspaceName }: Props) {
+export function AppSidebar({ userName, userEmail, workspaceName, plan = "professional" }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const initials = userName
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase()
-    .slice(0, 2);
+    .slice(0, 2) || "??";
 
   async function handleSignOut() {
     await authClient.signOut();
     router.push("/sign-in");
   }
 
+  function isActive(href: string) {
+    return pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+  }
+
+  const navItemClass = (href: string) =>
+    `flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-[0.85rem] transition-all duration-150 mb-0.5 ${
+      isActive(href)
+        ? "bg-ink text-canvas font-medium"
+        : "text-ink-muted hover:text-ink hover:bg-canvas-warm"
+    }`;
+
   return (
-    <aside className="w-56 shrink-0 border-r border-[#e8e4dc] bg-[#faf9f6] flex flex-col h-screen sticky top-0">
-      <div className="px-5 py-5 border-b border-[#e8e4dc]">
-        <span className="text-xl font-bold tracking-tight text-[#1a1a1a]">Vekstor</span>
+    <aside className="fixed left-0 top-0 bottom-0 w-[240px] bg-canvas-soft flex flex-col border-r border-bdr z-50">
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-bdr">
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="flex items-center w-full text-left"
+        >
+          <span
+            className="text-[1.25rem] font-bold tracking-tight text-ink"
+            style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}
+          >
+            vekstor
+          </span>
+        </button>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={cn(
-              "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              pathname === href || pathname.startsWith(href + "/")
-                ? "bg-[#1a1a1a] text-white"
-                : "text-[#4a4a4a] hover:bg-[#f0ede6] hover:text-[#1a1a1a]"
+      {/* Nav */}
+      <nav className="flex-1 py-3 px-3 overflow-y-auto">
+        {NAV_SECTIONS.map((section, sIdx) => (
+          <div key={section.label || sIdx} className={sIdx > 0 ? "mt-4" : ""}>
+            {section.label && (
+              <div className="text-[0.62rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold px-3 mb-1.5">
+                {section.label}
+              </div>
             )}
-          >
-            <Icon size={16} />
-            {label}
-          </Link>
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => router.push(item.href)}
+                  className={navItemClass(item.href)}
+                >
+                  <Icon size={16} />
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
         ))}
+
+        <div className="my-4 mx-3 border-t border-bdr" />
+
+        <button
+          onClick={() => router.push("/settings")}
+          className={navItemClass("/settings")}
+        >
+          <Settings size={16} />
+          Innstillinger
+        </button>
       </nav>
 
-      <div className="border-t border-[#e8e4dc] p-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            className="flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[#f0ede6] transition-colors w-full text-left"
-          >
-            <Avatar className="h-7 w-7">
-              <AvatarFallback className="text-xs bg-[#1a1a1a] text-white">{initials}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-[#1a1a1a] truncate">{userName}</p>
-              <p className="text-xs text-[#6b6b6b] truncate">{workspaceName}</p>
+      {/* Activity */}
+      <div className="px-3 pb-1">
+        <button
+          onClick={() => router.push("/pipeline")}
+          className="flex items-center gap-2.5 w-full px-3 py-2 rounded-md text-[0.85rem] text-ink-muted hover:text-ink hover:bg-canvas-warm transition-all duration-150"
+        >
+          <History size={16} />
+          <span className="flex-1 text-left">Aktivitet</span>
+        </button>
+      </div>
+
+      {/* User card */}
+      <div className="p-3 border-t border-bdr relative">
+        <button
+          onClick={() => setShowUserMenu(!showUserMenu)}
+          className="flex items-center gap-2.5 p-2 rounded-md w-full hover:bg-canvas-warm transition-all duration-150"
+        >
+          <div className="w-8 h-8 rounded-md flex items-center justify-center text-[0.72rem] font-semibold text-canvas bg-ink flex-shrink-0">
+            {initials}
+          </div>
+          <div className="flex-1 min-w-0 text-left">
+            <div className="text-[0.8rem] font-medium text-ink truncate">{userName}</div>
+            <div className="text-[0.65rem] text-ink-subtle uppercase tracking-wider font-semibold">
+              {plan}
             </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="top" align="start" className="w-52">
-            <DropdownMenuLabel>
-              <p className="font-medium">{userName}</p>
-              <p className="text-xs text-[#6b6b6b] font-normal">{userEmail}</p>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push("/settings")}>
-              <Settings size={14} className="mr-2" /> Innstillinger
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} variant="destructive">
-              <LogOut size={14} className="mr-2" /> Logg ut
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </div>
+          <ChevronDown
+            size={14}
+            className={`text-ink-subtle transition-transform flex-shrink-0 ${showUserMenu ? "rotate-180" : ""}`}
+          />
+        </button>
+
+        {showUserMenu && (
+          <div className="absolute bottom-full left-3 right-3 mb-1 rounded-md border border-bdr bg-canvas-soft shadow-lg overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-bdr">
+              <p className="text-[0.8rem] font-medium text-ink">{userName}</p>
+              <p className="text-[0.72rem] text-ink-subtle">{userEmail}</p>
+            </div>
+            <button
+              onClick={() => { router.push("/settings"); setShowUserMenu(false); }}
+              className="flex items-center gap-2.5 w-full px-4 py-2.5 text-[0.8rem] text-ink-muted hover:text-ink hover:bg-canvas-warm transition-all"
+            >
+              <Settings size={14} />
+              Innstillinger
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2.5 w-full px-4 py-2.5 text-[0.8rem] text-err hover:bg-rose-50 transition-all border-t border-bdr"
+            >
+              <LogOut size={14} />
+              Logg ut
+            </button>
+          </div>
+        )}
       </div>
     </aside>
   );

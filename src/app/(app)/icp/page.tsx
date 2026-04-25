@@ -19,27 +19,29 @@ export default async function ICPPage() {
   });
 
   return (
-    <div className="p-8 max-w-2xl">
-      <div className="mb-8">
-        <p className="text-xs uppercase tracking-widest text-[#6b6b6b] mb-1">PROFIL</p>
-        <h1 className="text-2xl font-bold text-[#1a1a1a]">ICP-profil</h1>
-        <p className="text-sm text-[#6b6b6b] mt-1">Definer din ideelle kundeprofil</p>
+    <div className="min-h-screen bg-canvas">
+      <div className="px-8 py-5 bg-canvas border-b border-bdr sticky top-0 z-40">
+        <div className="text-[0.6rem] uppercase tracking-[0.15em] text-ink-subtle font-semibold mb-1">INNSIKT</div>
+        <h1 className="text-[1.7rem] font-semibold tracking-tight text-ink leading-none" style={{ fontFamily: "var(--font-work-sans), system-ui, sans-serif" }}>ICP-analyse</h1>
+        <p className="text-ink-muted text-[0.82rem] mt-1.5">Definer din ideelle kundeprofil for å målrette prospekteringen</p>
       </div>
-      <ICPForm
-        initial={{
-          companyName: icp?.companyName ?? "",
-          senderName: icp?.senderName ?? session.user.name,
-          yourIndustry: icp?.yourIndustry ?? "",
-          whatYouSell: icp?.whatYouSell ?? "",
-          targetIndustries: icp?.targetIndustries ?? "",
-          companySize: icp?.companySize ?? "",
-          minRevenue: icp?.minRevenue ?? "",
-          targetRegion: icp?.targetRegion ?? "",
-          problemYouSolve: icp?.problemYouSolve ?? "",
-          decisionMakerTitle: icp?.decisionMakerTitle ?? "",
-          decisionMakerDept: icp?.decisionMakerDept ?? "",
-        }}
-      />
+      <div className="p-8 max-w-2xl">
+        <ICPForm
+          initial={{
+            companyName: icp?.companyName ?? "",
+            senderName: icp?.senderName ?? session.user.name,
+            yourIndustry: icp?.yourIndustry ?? "",
+            whatYouSell: icp?.whatYouSell ?? "",
+            targetIndustries: icp?.targetIndustries ?? "",
+            companySize: icp?.companySize ?? "",
+            minRevenue: icp?.minRevenue ?? "",
+            targetRegion: icp?.targetRegion ?? "",
+            problemYouSolve: icp?.problemYouSolve ?? "",
+            decisionMakerTitle: icp?.decisionMakerTitle ?? "",
+            decisionMakerDept: icp?.decisionMakerDept ?? "",
+          }}
+        />
+      </div>
     </div>
   );
 }
