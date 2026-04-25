@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Save, Sparkles } from "lucide-react";
 
 interface ICPData {
   companyName: string;
@@ -27,9 +27,45 @@ interface ICPData {
 export default function ICPForm({ initial }: { initial: ICPData }) {
   const [data, setData] = useState<ICPData>(initial);
   const [loading, setLoading] = useState(false);
+  const [extracting, setExtracting] = useState(false);
 
   function set(field: keyof ICPData, value: string) {
     setData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleExtract() {
+    if (!data.whatYouSell) {
+      toast.error("Fyll inn 'Hva selger du?' først");
+      return;
+    }
+    setExtracting(true);
+    try {
+      const resp = await fetch("/api/icp/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyName: data.companyName,
+          whatYouSell: data.whatYouSell,
+          currentCustomers: data.targetIndustries,
+        }),
+      });
+      if (!resp.ok) throw new Error("Feil ved AI-ekstraksjon");
+      const text = await resp.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Ugyldig svar fra AI");
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (parsed.targetIndustries) set("targetIndustries", parsed.targetIndustries);
+      if (parsed.targetSize) set("companySize", parsed.targetSize);
+      if (parsed.targetGeography) set("targetRegion", parsed.targetGeography);
+      if (parsed.targetRevenue) set("minRevenue", parsed.targetRevenue);
+      if (parsed.problemYouSolve) set("problemYouSolve", parsed.problemYouSolve);
+      if (parsed.decisionMakerTitle) set("decisionMakerTitle", parsed.decisionMakerTitle);
+      toast.success("ICP-forslag generert — juster og lagre");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Feil ved AI-ekstraksjon");
+    } finally {
+      setExtracting(false);
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -114,10 +150,22 @@ export default function ICPForm({ initial }: { initial: ICPData }) {
         </CardContent>
       </Card>
 
-      <Button type="submit" disabled={loading} className="flex items-center gap-2">
-        <Save size={15} />
-        {loading ? "Lagrer…" : "Lagre ICP-profil"}
-      </Button>
+      <div className="flex items-center gap-3">
+        <Button type="submit" disabled={loading} className="flex items-center gap-2">
+          <Save size={15} />
+          {loading ? "Lagrer…" : "Lagre ICP-profil"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleExtract}
+          disabled={extracting}
+          className="flex items-center gap-2"
+        >
+          <Sparkles size={14} />
+          {extracting ? "Genererer…" : "Fyll ut med AI"}
+        </Button>
+      </div>
     </form>
   );
 }

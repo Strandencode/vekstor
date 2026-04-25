@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Copy, Save, Mail, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Copy, Save, Mail, Eye, EyeOff, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 const MERGE_TAGS = [
@@ -53,9 +53,36 @@ function TemplateEditor({
   const [body, setBody] = useState(template.body ?? "");
   const [preview, setPreview] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   function insertTag(tag: string) {
     setBody((b) => b + tag);
+  }
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      const resp = await fetch("/api/email/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          icp: { companyName: "Din Bedrift AS", whatYouSell: "", problemYouSolve: "", senderName: "" },
+          lead: { name: "{{company_name}}", industry: "{{industry}}", municipality: "{{city}}", contactName: "{{contact_name}}" },
+        }),
+      });
+      if (!resp.ok) throw new Error("Feil ved generering");
+      const text = await resp.text();
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("Ugyldig AI-svar");
+      const parsed = JSON.parse(jsonMatch[0]);
+      if (parsed.subject) setSubject(parsed.subject);
+      if (parsed.body) setBody(parsed.body.replace(/\\n/g, "\n"));
+      toast.success("E-postutkast generert");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Feil ved generering");
+    } finally {
+      setGenerating(false);
+    }
   }
 
   async function handleSave() {
@@ -87,6 +114,15 @@ function TemplateEditor({
           >
             {preview ? <EyeOff size={14} /> : <Eye size={14} />}
           </button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleGenerate}
+            disabled={generating}
+            className="flex items-center gap-1.5"
+          >
+            <Sparkles size={12} /> {generating ? "Genererer…" : "AI-utkast"}
+          </Button>
           <Button size="sm" variant="outline" onClick={onClose}>Avbryt</Button>
           <Button size="sm" onClick={handleSave} disabled={saving} className="flex items-center gap-1.5">
             <Save size={12} /> {saving ? "Lagrer…" : "Lagre"}

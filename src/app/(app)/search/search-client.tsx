@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Search, Loader2, Bookmark, Kanban, ExternalLink } from "lucide-react";
+import { Search, Loader2, Bookmark, Kanban, ExternalLink, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 const EMPLOYEE_RANGES = [
@@ -39,6 +39,10 @@ export default function SearchClient() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [listName, setListName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [enrichTarget, setEnrichTarget] = useState<BRREGCompany | null>(null);
+  const [enrichWebsite, setEnrichWebsite] = useState("");
+  const [enrichLoading, setEnrichLoading] = useState(false);
+  const [enrichResult, setEnrichResult] = useState<{ emails: string[]; phones: string[] } | null>(null);
 
   const range = EMPLOYEE_RANGES[parseInt(employeeRange)];
 
@@ -96,6 +100,28 @@ export default function SearchClient() {
     }
     toast.success(`${success} selskap(er) lagt til i pipeline`);
     setSelected(new Set());
+  }
+
+  function openEnrich(company: BRREGCompany) {
+    setEnrichTarget(company);
+    setEnrichWebsite(company.hjemmeside ?? "");
+    setEnrichResult(null);
+  }
+
+  async function runEnrich() {
+    if (!enrichWebsite.trim()) return;
+    setEnrichLoading(true);
+    try {
+      const url = `/api/enrich?website=${encodeURIComponent(enrichWebsite.trim())}`;
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error("Feil ved uthenting");
+      const data = await resp.json();
+      setEnrichResult({ emails: data.emails ?? [], phones: data.phones ?? [] });
+    } catch {
+      toast.error("Kunne ikke hente kontaktinfo");
+    } finally {
+      setEnrichLoading(false);
+    }
   }
 
   async function handleSaveList() {
@@ -247,14 +273,23 @@ export default function SearchClient() {
                     <td className="px-4 py-2.5 text-[#4a4a4a] text-xs">{company.antallAnsatte ?? "—"}</td>
                     <td className="px-4 py-2.5 text-[#4a4a4a] font-mono text-xs">{company.organisasjonsnummer}</td>
                     <td className="px-4 py-2.5">
-                      <a
-                        href={`https://data.brreg.no/enhetsregisteret/oppslag/enheter/${company.organisasjonsnummer}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#6b6b6b] hover:text-[#1a1a1a]"
-                      >
-                        <ExternalLink size={13} />
-                      </a>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`https://data.brreg.no/enhetsregisteret/oppslag/enheter/${company.organisasjonsnummer}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#6b6b6b] hover:text-[#1a1a1a]"
+                        >
+                          <ExternalLink size={13} />
+                        </a>
+                        <button
+                          onClick={() => openEnrich(company)}
+                          className="text-[#6b6b6b] hover:text-[#1a1a1a]"
+                          title="Hent kontaktinfo"
+                        >
+                          <Sparkles size={13} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -263,6 +298,61 @@ export default function SearchClient() {
           </div>
         </>
       )}
+
+      <Dialog open={!!enrichTarget} onOpenChange={(open) => { if (!open) setEnrichTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hent kontaktinfo — {enrichTarget?.navn}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label>Nettside</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={enrichWebsite}
+                  onChange={(e) => setEnrichWebsite(e.target.value)}
+                  placeholder="https://selskap.no"
+                />
+                <Button onClick={runEnrich} disabled={enrichLoading || !enrichWebsite.trim()}>
+                  {enrichLoading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                </Button>
+              </div>
+            </div>
+            {enrichResult && (
+              <div className="space-y-2">
+                {enrichResult.emails.length > 0 ? (
+                  <div>
+                    <p className="text-xs font-medium text-[#6b6b6b] mb-1">E-poster funnet</p>
+                    <div className="space-y-1">
+                      {enrichResult.emails.map((e) => (
+                        <div key={e} className="flex items-center justify-between text-sm bg-[#faf9f6] px-3 py-1.5 rounded">
+                          <span className="font-mono text-xs">{e}</span>
+                          <button onClick={() => { navigator.clipboard.writeText(e); toast.success("Kopiert"); }} className="text-xs text-[#6b6b6b] hover:text-[#1a1a1a]">Kopier</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-xs text-[#9b9b9b]">Ingen e-poster funnet.</p>
+                )}
+                {enrichResult.phones.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-[#6b6b6b] mb-1">Telefonnumre funnet</p>
+                    <div className="space-y-1">
+                      {enrichResult.phones.map((p) => (
+                        <div key={p} className="flex items-center justify-between text-sm bg-[#faf9f6] px-3 py-1.5 rounded">
+                          <span className="font-mono text-xs">{p}</span>
+                          <button onClick={() => { navigator.clipboard.writeText(p); toast.success("Kopiert"); }} className="text-xs text-[#6b6b6b] hover:text-[#1a1a1a]">Kopier</button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
         <DialogContent>
