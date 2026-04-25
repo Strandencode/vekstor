@@ -1,10 +1,21 @@
 export const dynamic = "force-dynamic";
 
-export default function PipelinePage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#1a1a1a] mb-2">Pipeline</h1>
-      <p className="text-sm text-[#6b6b6b]">Under utvikling</p>
-    </div>
-  );
+import { db } from "@/db";
+import { pipelineItems } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { getCurrentWorkspace } from "@/lib/get-workspace";
+import PipelineClient from "./pipeline-client";
+import { redirect } from "next/navigation";
+
+export default async function PipelinePage() {
+  const ctx = await getCurrentWorkspace();
+  if (!ctx) redirect("/sign-in");
+
+  const items = await db
+    .select()
+    .from(pipelineItems)
+    .where(eq(pipelineItems.workspaceId, ctx.workspace.id))
+    .orderBy(pipelineItems.movedAt);
+
+  return <PipelineClient initialItems={items} />;
 }

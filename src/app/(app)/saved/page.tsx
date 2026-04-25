@@ -1,10 +1,21 @@
 export const dynamic = "force-dynamic";
 
-export default function SavedPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#1a1a1a] mb-2">Lagrede</h1>
-      <p className="text-sm text-[#6b6b6b]">Under utvikling</p>
-    </div>
-  );
+import { db } from "@/db";
+import { savedLists } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
+import { getCurrentWorkspace } from "@/lib/get-workspace";
+import SavedClient from "./saved-client";
+import { redirect } from "next/navigation";
+
+export default async function SavedPage() {
+  const ctx = await getCurrentWorkspace();
+  if (!ctx) redirect("/sign-in");
+
+  const lists = await db
+    .select()
+    .from(savedLists)
+    .where(eq(savedLists.workspaceId, ctx.workspace.id))
+    .orderBy(desc(savedLists.createdAt));
+
+  return <SavedClient initialLists={lists} />;
 }

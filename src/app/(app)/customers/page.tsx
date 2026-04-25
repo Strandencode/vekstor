@@ -1,10 +1,21 @@
 export const dynamic = "force-dynamic";
 
-export default function CustomersPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#1a1a1a] mb-2">Kunder</h1>
-      <p className="text-sm text-[#6b6b6b]">Under utvikling</p>
-    </div>
-  );
+import { db } from "@/db";
+import { customers } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
+import { getCurrentWorkspace } from "@/lib/get-workspace";
+import CustomersClient from "./customers-client";
+import { redirect } from "next/navigation";
+
+export default async function CustomersPage() {
+  const ctx = await getCurrentWorkspace();
+  if (!ctx) redirect("/sign-in");
+
+  const list = await db
+    .select()
+    .from(customers)
+    .where(eq(customers.workspaceId, ctx.workspace.id))
+    .orderBy(desc(customers.wonDate));
+
+  return <CustomersClient initialCustomers={list} />;
 }

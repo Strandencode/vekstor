@@ -1,10 +1,21 @@
 export const dynamic = "force-dynamic";
 
-export default function EmailPage() {
-  return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold text-[#1a1a1a] mb-2">E-post</h1>
-      <p className="text-sm text-[#6b6b6b]">Under utvikling</p>
-    </div>
-  );
+import { db } from "@/db";
+import { emailTemplates } from "@/db/schema";
+import { eq, desc } from "drizzle-orm";
+import { getCurrentWorkspace } from "@/lib/get-workspace";
+import EmailClient from "./email-client";
+import { redirect } from "next/navigation";
+
+export default async function EmailPage() {
+  const ctx = await getCurrentWorkspace();
+  if (!ctx) redirect("/sign-in");
+
+  const templates = await db
+    .select()
+    .from(emailTemplates)
+    .where(eq(emailTemplates.workspaceId, ctx.workspace.id))
+    .orderBy(desc(emailTemplates.updatedAt));
+
+  return <EmailClient initialTemplates={templates} />;
 }
